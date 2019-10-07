@@ -38,6 +38,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drchrono',
+    'patients',
+    'dashboard',
     'social_django',
     'rest_framework',
 )
@@ -118,12 +120,17 @@ STATIC_URL = '/static/'
 # 3.2) change your hostname if you're using a different way to access this kiosk; by default it'll run on localhost:8080
 # 4) copy your CLIENT_ID and SECRET keys into a file docker/environment. See the example
 # 5) Ask a dev if this doesn't work quickly; these settings can be fiddly, and we'd rather not wast time with them.
-SOCIAL_AUTH_DRCHRONO_KEY = os.getenv('SOCIAL_AUTH_CLIENT_ID')
-SOCIAL_AUTH_DRCHRONO_SECRET = os.getenv('SOCIAL_AUTH_SECRET')
+#SOCIAL_AUTH_DRCHRONO_KEY = os.getenv('SOCIAL_AUTH_CLIENT_ID')
+#SOCIAL_AUTH_DRCHRONO_SECRET = os.getenv('SOCIAL_AUTH_SECRET')
+SOCIAL_AUTH_DRCHRONO_KEY = 'dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB'
+SOCIAL_AUTH_DRCHRONO_SECRET = 'm0AgqqeCYXdBLuwaH6KDBZZZrM8JlQsI1WWTvTGKLherpa11DIQPJqQNTrAkQkfeiodc4AeU3UBjz7TR6ipmJ75nDQ23suXLj7UssigW5pHGEJ3L6CJCtnvazvJcc0ae'
 
 
 LOGIN_REDIRECT_URL = '/welcome/'
+#LOGIN_REDIRECT_URL = '/complete/drchrono/'
 LOGIN_URL = 'login/drchrono'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SHELL_PLUS = "ipython"
 
@@ -146,3 +153,7 @@ LOGGING = {
         },
     },
 }
+
+#https://els2466.drchrono.com/o/authorize/?state=eWlhy09pvvkocKLFCiooAs6Cg6AVsS9A&redirect_uri=http://127.0.0.1:8000/complete/drchrono/&response_type=code&client_id=None#/&response_type=code&client_id=None
+#https://els2466.drchrono.com/o/authorize/?state=t0KOnuymw7klClflWfHqkseAa6BMI80j&redirect_uri=http://localhost:8080/complete/drchrono/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB#/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB
+#https://els2466.drchrono.com/o/authorize/?state=eWlhy09pvvkocKLFCiooAs6Cg6AVsS9A&redirect_uri=http://127.0.0.1:8080/complete/drchrono/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB#/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB

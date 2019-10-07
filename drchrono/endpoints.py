@@ -1,6 +1,6 @@
 import requests
 import logging
-
+from datetime import datetime, timedelta
 
 class APIException(Exception): pass
 
@@ -154,6 +154,7 @@ class BaseEndpoint(object):
         """
         url = self._url(id)
         self._auth_headers(kwargs)
+
         if partial:
             response = requests.patch(url, data, **kwargs)
         else:
@@ -180,6 +181,54 @@ class BaseEndpoint(object):
 class PatientEndpoint(BaseEndpoint):
     endpoint = "patients"
 
+    def list(self, params=None, doctor=None, **kwargs):
+        """
+        List patients associated with doctor
+        """
+        # Just parameter parsing & checking
+        params = params or {}
+        if doctor:
+            params['doctor'] = doctor
+        if 'doctor' not in params:
+            raise Exception("Must provide doctor id")
+        return super(PatientEndpoint, self).list(params, **kwargs)
+
+    '''
+        Get patients for a given doctor
+    '''
+    def get_patients(self, doctor):
+        patient_list = []
+        patients = self.list(doctor=doctor)
+        #for yup in patients:
+        #for pb in patients:
+        #    print('Yup', pb)
+        #print("+++++++++ This is patients", patients)
+        for p in patients:
+            #print("!!!!!!!!!!!!!!!!!!!")
+            patient_fields = {
+                'doctor': doctor,
+                'id': p['id'],
+                'first_name': p['first_name'],
+                'last_name': p['last_name'],
+                'ssn': p['social_security_number'],
+                'email': p['email'],
+                'gender': p['gender'],
+                'dob': p['date_of_birth'],
+                'address': p['address'],
+                'city': p['city'],
+                'state': p['state'],
+                'zip_code': p['zip_code'],
+                'cell_phone': p['cell_phone'],
+                'patient_pic': p['patient_photo']
+            }
+            #print('P **********', p)
+            patient_list.append(patient_fields)
+
+        #print(patients)
+        #print(patient_list)
+        return patient_list
+        #updated_patient, created = Patient.objects.update_or_create(defaults=patient_fields, pk=p['id'])
+
 
 class AppointmentEndpoint(BaseEndpoint):
     endpoint = "appointments"
@@ -200,9 +249,73 @@ class AppointmentEndpoint(BaseEndpoint):
             raise Exception("Must provide either start & end, or date argument")
         return super(AppointmentEndpoint, self).list(params, **kwargs)
 
+    #get todays appointments
+    def get_appoinments(self, doctor, date):
+        appt_list = []
+        #check if a specific doctor was passed
+        if not doctor:
+            #doctor = Doctor.objects.first()
+            d = {}
+        else:
+            d = {'doctor': doctor}
+        #check if a specific date was passed
+        #if no date passed, get all appointments for next 30 days
+        if not date:
+            date = datetime.now()
+            month_later = date + timedelta(days=30)
+            date = date.strftime('%Y-%m-%d')
+            month_later = month_later.strftime('%Y-%m-%d')
+            appointments = self.list(params=d, start=date, end=month_later)
+        else:
+            appointments = self.list(params=d, date=date)
+
+        for appt in appointments:
+            status = appt['status']
+            if not status:
+                status = ""
+            checked_in = False #Appointment.patient_checked_in(status)
+            #try:
+            #    patient = Patient.objects.get(id=appt['patient'])
+            #except Patient.DoesNotExist:
+            #    patient = None
+            appt_fields = {
+                #'patient': patient,
+                'doctor': doctor,
+                'patient': appt['patient'],
+                'exam_room': appt['exam_room'],
+                'duration': appt['duration'],
+                'appt_time': appt['scheduled_time'],
+                'status': status,
+                'checked_in': checked_in,
+                'reason': appt['reason']
+            }
+            #print('P **********', p)
+            appt_list.append(appt_fields)
+            #print(appt_fields['doctor'], appt_fields['appt_time'])
+            #updated_appt, created = Appointment.objects.update_or_create(defaults=appt_fields, pk=appt['id'])
+
+        return appt_list
 
 class DoctorEndpoint(BaseEndpoint):
     endpoint = "doctors"
+
+    def get_doctor(self):
+        #get first doctor from api as JSON object
+        doctor = {}
+        doctor_fields = next(self.list())
+        doctor['id'] = doctor_fields['id']
+        doctor['first_name'] = doctor_fields['first_name']
+        doctor['last_name'] = doctor_fields['last_name']
+        #update or create doctor model in db
+        #doctor['id'] = id
+        #doctor['first_name'] = first_name
+        #doctor['last_name'] = last_name
+        #doctor, created = Doctor.objects.update_or_create(pk=id,
+        #    defaults={
+        #        'first_name': first_name,
+        #        'last_name': last_name
+        #    })
+        return doctor
 
     def update(self, id, data, partial=True, **kwargs):
         raise NotImplementedError("the API does not allow updating doctors")
@@ -212,7 +325,6 @@ class DoctorEndpoint(BaseEndpoint):
 
     def delete(self, id, **kwargs):
         raise NotImplementedError("the API does not allow deleteing doctors")
-
 
 class AppointmentProfileEndpoint(BaseEndpoint):
     endpoint = "appointment_profiles"

@@ -83,14 +83,13 @@ celerybeat-schedule
 .venv/
 venv/
 ENV/
+drenv/
 
 # Spyder project settings
 .spyderproject
 
 # Rope project settings
 .ropeproject
-
-*.sqlite3
 
 # secret environment stuff
 docker/environment

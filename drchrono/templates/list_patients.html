@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Patients{% endblock %}
+{% block login_active %}active{% endblock %}
+{% csrf_token %}
+
+{% block body %}
+
+<div class="container">
+   <div><img src="https://app.queuedr.com/assets/drchrono-10d30870dec6d08f5e2d129c374789ec478529f3e1e7017c5f5ca120d6a37587.png" /></div>
+   <h2 style="text-align:center">Dashboard</h2>
+	<hr
+	style="
+	   border:none;
+	   height:10px;
+	   background-color:green;
+	">
+	<div class="card">
+	   <div style="text-align:center" class="card-header"><h2>Patients</h2></div>
+	   	<table class="table" id="appointments">
+		   	<thead class="thead-dark">
+               <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">First</th>
+                  <th scope="col">Last</th>
+                  <th scope="col">DOB</th>
+                  <th scope="col">Address</th>
+                  <th scope="col">City</th>
+                  <th scope="col">State</th>
+                  <th scope="col">ZIP</th>
+               </tr>
+            </thead>
+            <tbody>
+               {% for p in patient %}
+                  <tr>
+                     <td>{{ p.id }}</td>
+                     <td>{{ p.first_name }}</td>
+                     <td>{{ p.last_name }}</td>
+                     <td>{{ p.dob }}</td>
+                     <td>{{ p.address }}</td>
+                     <td>{{ p.city }}</td>
+                     <td>{{ p.state }}</td>
+                     <td>{{ p.zip_code }}</td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+      
+		   </table>
+      </div>
+   </div>
+</div>
+{{% endblock body %}
+

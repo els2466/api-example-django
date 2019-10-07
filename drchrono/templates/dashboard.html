@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block login_active %}active{% endblock %}
+{% csrf_token %}
+
+{% block body %}
+	<script>
+		var myClockInterval = setInterval(myClock, 1000);
+		
+		function myClock() {
+			var new_date = new Date();
+			var elapsed_time = document.getElementsByClassName("ElapsedTime")
+			var total = document.getElementById("TotalTimeWaiting")
+			var total_format = document.getElementById("TotalTimeWaitingFormat")
+			var avg = document.getElementById("AverageTimeWaiting")
+			var count = 0;
+            for (i=0; i<elapsed_time.length; i++) {
+				time_id = elapsed_time[i].id;
+				var select_element = document.getElementById('select_'+time_id)
+				if (select_element.value == 'Checked_In') {
+					//if (elapsed_time[i].innerHTML == "") {
+					//	elapsed_time[i].innerHTML = 0;
+					//}
+					// hidden time in seconds
+					var elapsed_int = parseInt(elapsed_time[i].innerHTML, 10) + 1;
+					elapsed_time[i].innerHTML = elapsed_int;
+
+					// converted seconds to hh:mm:ss
+					var format_element = document.getElementById('format_time_'+time_id)
+					format_element.innerHTML = convertSecondstoTime(elapsed_int);
+					if (elapsed_int > 300) {
+						format_element.style.color = 'red';
+					}
+
+					var total_int = parseInt(total.innerHTML, 10) + 1;
+					total.innerHTML = total_int;
+					total_format.innerHTML = convertSecondstoTime(total_int);
+					count = count + 1;
+				}
+				else if (select_element.value == 'In_Session') {
+					count = count + 1;
+				}
+				else if (select_element.value != 'In_Session') {
+					elapsed_time[i].innerHTML = 0;
+					var format_element_blank = document.getElementById('format_time_'+time_id)
+					format_element_blank.innerHTML = "";
+				}
+            }
+			avg.innerHTML = convertSecondstoTime(Math.round(parseInt(total.innerHTML, 10) / count));
+			document.getElementById("main_clock").innerHTML = new_date.toLocaleTimeString();
+		}
+
+        function convertSecondstoTime(given_seconds) { 
+  
+            hours = Math.floor(given_seconds / 3600); 
+            minutes = Math.floor((given_seconds - (hours * 3600)) / 60); 
+            seconds = given_seconds - (hours * 3600) - (minutes * 60); 
+  
+            timeString = hours.toString().padStart(2, '0') + ':' + 
+                minutes.toString().padStart(2, '0') + ':' + 
+                seconds.toString().padStart(2, '0'); 
+  
+            return timeString; 
+		} 
+
+	</script>
+
+<div class="container">
+	<div>
+		<img src="https://app.queuedr.com/assets/drchrono-10d30870dec6d08f5e2d129c374789ec478529f3e1e7017c5f5ca120d6a37587.png" />
+	</div>
+	<br>
+    <h2 style="text-align:center">Dashboard</h2>
+	<hr
+	style="
+	   border:none;
+	   height:10px;
+	   background-color:green;
+	">
+	<h2><div align="center" id="main_clock" ></div></h2>
+	<br>
+	<div class="card" style="width: 100%;">
+		<div class="card-header"><h2>Today's Appointments</h2>
+		</div>
+		<div><p></p></div>
+			<div class="row">
+				<div class="col-3" align="right">
+					Show:
+				</div>
+				<div class="col-9">
+				<input type="checkbox" name="arrived" value="" onclick="toggle_arrived(checked, this)" checked> Arrived   </input>
+				<input type="checkbox" name="checked_in" value="" onclick="toggle_checked_in(checked, this)" checked> Checked In   </input>
+				<input type="checkbox" name="in_room" value="" onclick="toggle_in_room(checked, this)" checked> In Room   </input>
+				<input type="checkbox" name="complete" value="" onclick="toggle_complete(checked, this)" checked> Complete   </input>
+				<input type="checkbox" name="confirmed" value="" onclick="toggle_confirmed(checked, this)" checked> Confirmed   </input>
+				<input type="checkbox" name="in_session" value="" onclick="toggle_in_session(checked, this)" checked> In Session   </input><br>
+				<input type="checkbox" name="no_show" value="" onclick="toggle_no_show(checked, this)" checked> No Show   </input>
+				<input type="checkbox" name="not_confirmed" value="" onclick="toggle_not_confirmed(checked, this)" checked> Not Confirmed   </input>
+				<input type="checkbox" name="not_rescheduled" value="" onclick="toggle_not_rescheduled(checked, this)" checked> Not Rescheduled   </input>
+				</div>
+			</div>
+			<div><p></p></div>
+			<table class="table" id="appointments">
+				<thead class="thead-dark">
+					<tr>
+						<th scope="col">Patient</th>
+						<th scope="col">Appointment Time</th>
+						<th scope="col">Duration</th>
+						<th scope="col">Time Waiting</th>
+						<th scope="col">Status</th>
+					</tr>
+				</thead>
+	            <tbody>
+					{% for a in appointment %}
+						<tr>
+							<td>{{ a.first_name }} {{ a.last_name }}</td>
+							<td>{{ a.appt_time }}</td>
+							<td>{{ a.duration }}</td>
+							<td><div class="myfimeformat" id="{{ a.format_time_id }}"></div></td>
+							<td>
+							<select class="mySelect" id="{{ a.select_id }}" onchange="status_update({{ a.patient }}, this)">
+								{% if a.status == "" %}
+									<option value="" selected></option>
+								{% else %}
+									<option value=""></option>
+								{% endif %}
+								{% if a.status == "Arrived" %}
+									<option value="Arrived" selected>Arrived</option>
+								{% else %}
+									<option value="Arrived">Arrived</option>
+								{% endif %}
+								{% if a.status == "Checked In" %}
+									<option value="Checked_In" selected>Checked In</option>
+								{% elif a.status == "Checked_In" %}
+									<option value="Checked_In" selected>Checked In</option>
+								{% else %}
+									<option value="Checked_In">Checked In</option>
+								{% endif %}
+								{% if a.status == "In Room" %}
+									<option value="In_Room" selected>In Room</option>
+								{% elif a.status == "In_Room" %}
+									<option value="In_Room" selected>In Room</option>
+								{% else %}
+									<option value="In_Room">In Room</option>
+								{% endif %}
+								{% if a.status == "Cancelled" %}
+									<option value="Cancelled" selected>Cancelled</option>
+								{% else %}
+									<option value="Cancelled">Cancelled</option>
+								{% endif %}
+								{% if a.status == "Complete" %}
+									<option value="Complete" selected>Complete</option>
+								{% else %}
+									<option value="Complete">Complete</option>
+								{% endif %}
+								{% if a.status == "Confirmed" %}
+									<option value="Confirmed" selected>Confirmed</option>
+								{% else %}
+									<option value="Confirmed">Confirmed</option>
+								{% endif %}
+								{% if a.status == "In Session" %}
+									<option value="In_Session" selected>In Session</option>
+								{% elif a.status == "In_Session" %}
+									<option value="In_Session" selected>In Session</option>
+								{% else %}
+									<option value="In_Session">In Session</option>
+								{% endif %}
+								{% if a.status == "No Show" %}
+									<option value="No_Show" selected>No Show</option>
+								{% elif a.status == "No_Show" %}
+									<option value="No_Show" selected>No Show</option>
+								{% else %}
+									<option value="No_Show">No Show</option>
+								{% endif %}
+								{% if a.status == "Not Confirmed" %}
+									<option value="Not_Confirmed" selected>Not Confirmed</option>
+								{% elif a.status == "Not_Confirmed" %}
+									<option value="Not_Confirmed" selected>Not Confirmed</option>
+								{% else %}
+									<option value="Not_Confirmed">Not Confirmed</option>
+								{% endif %}
+								{% if a.status == "Not Rescheduled" %}
+									<option value="Not_Rescheduled" selected>Not Rescheduled</option>
+								{% elif a.status == "Not_Rescheduled" %}
+									<option value="Not_Rescheduled" selected>Not Rescheduled</option>
+								{% else %}
+									<option value="Not_Rescheduled">Not Rescheduled</option>
+								{% endif %}
+							</select>
+							</td>
+							<td style="visibility:collapse;"><div style="display:none;" class="ElapsedTime" id="{{ a.time_id }}">0</div></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+	</div>
+	<div class="card" style="width: 100%;">
+		<div class="card-header"><h2>Analytics</h2></div>
+		<table class="table" id="appointments">
+			<thead class="thead-dark">
+				<tr>
+					<th scope="col">Total Time Waiting</th>
+					<th scope="col">Average Time Waiting</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><div id="TotalTimeWaitingFormat">0</div></td>
+					<td><div id="AverageTimeWaiting">0</div></td>
+					<td style="visibility:collapse;"><div style="display:none;" id="TotalTimeWaiting">0</div></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+{% block script %}
+<script>
+    var token = '{{csrf_token}}';
+
+	function status_update(id, element) {
+		//console.log("My My", id, element, element.value)
+		console.log("smokey, dokey")
+		$.ajax({
+			type: "POST",
+			headers: { "X-CSRFToken": token },
+        	url: "{% url 'dashboard' %}",
+        	dataType: "json",
+        	contentType: "application/json;",
+        	data: JSON.stringify({'id': id, 'status': element.value}),
+        	success: function(x) {
+				console.log('?', x)
+        		//$.ajax({
+				//	type: "POST",
+				//	headers: { "X-CSRFToken": token },
+        		//	url: "{% url 'dashboard' %}",
+				//	dataType: "json",
+				//	contentType: "application/json;",
+        		//	data: JSON.stringify({'id': id, 'status': status})
+    			//});
+				//get_appointments();
+				
+				console.log("okay, dokey")
+				if (element.value == "Cancelled") {
+					console.log("cancel this")
+					console.log($("#" + element.id))
+					$("#" + element.id).parent().parent().remove();
+				}
+        	}
+    	});
+	}
+
+	function get_appointments() {
+        $.ajax({
+            type: "GET",
+            headers: { "X-CSRFToken": token },
+            url: "{% url 'dashboard' %}"
+        });
+	}
+	
+	//function update_table() {
+	//	console.log('My Checkbox')
+		//for (a in appointment) {
+
+		//}
+	//	$("." + hide_show).hide();
+
+		//if (element.value == "Arrived") {
+		//	console.log($("#" + element.id))
+		//	$("#" + element.id).parent().parent().show();
+		//}
+	//}
+
+	function toggle_arrived(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'Arrived') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_checked_in(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'Checked_In') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_in_room(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'In_Room') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_complete(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'Complete') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_confirmed(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'Confirmed') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_in_session(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'In_Session') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_no_show(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'No_Show') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_not_confirmed(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'Not_Confirmed') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+	function toggle_not_rescheduled(value, element) {
+		var elapsed_time = document.getElementsByClassName("ElapsedTime")
+		for (i=0; i<elapsed_time.length; i++) {
+			time_id = elapsed_time[i].id;
+			var select_element = document.getElementById('select_'+time_id)
+			if (select_element.value == 'Not_Rescheduled') {
+				if (value) {
+					$("#" + select_element.id).parent().parent().show();
+				}
+				else {
+					$("#" + select_element.id).parent().parent().hide();
+				}
+			}
+		}
+	}
+
+</script>
+{% endblock script %}
+{{% endblock body %}
