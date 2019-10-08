@@ -47,26 +47,14 @@ class DashboardView(TemplateView):
         appts = models.GetTemplateIdTable()
 
         return patient_details, appts
-    '''
-    def get_context_data(self, **kwargs):
-        print("!!!!Get context data")
-        kwargs = super(DashboardView, self).get_context_data(**kwargs)
-        # Hit the API using one of the endpoints just to prove that we can
-        # If this works, then your oAuth setup is working correctly.
-        patient_details, appointment_details = self.make_api_request()
 
-        kwargs['patients'] = patient_details
-        kwargs['appointment'] = appointment_details
-
-        return kwargs
-    '''
     def get(self, request):
         access_token = self.request.session.get('access_token')
         a = AppointmentEndpoint(access_token)
         if request.method == 'GET':
             appts = models.GetTemplateIdTable()
             data = appts
-            print(data)
+
             if data == None:
                 return JsonResponse({"data": None})
             context = {
@@ -84,7 +72,6 @@ class DashboardView(TemplateView):
             request_data = json.loads(request.body)
             appointment_id = request_data.get("id")
             status = request_data.get("status")
-            print(appointment_id, status)
 
             models.AdjustAppointment(appointment_id, status)
 

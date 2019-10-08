@@ -84,3 +84,5 @@ If you have trouble at any point in the setup process, feel free to reach out to
 who introduced you to the project. We try to minimize setup friction, but sometimes things go wrong, and we genuinely 
 appreciate feedback about how to make things better!
 
+
+This is the version of the Hackathon by Ed Sterling.

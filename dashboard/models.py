@@ -13,7 +13,6 @@ def CreateTemplateIdTable(appts, patient_details):
     appt_id_list = []
     for a in appts:
         if a['patient'] not in appt_id_list:
-            print(a['patient'])
             appt_id_list.append(a['patient'])
             id = a['patient']
             value_list = patient_details[id]
@@ -31,7 +30,6 @@ def CreateTemplateIdTable(appts, patient_details):
             a['select_id'] = 'select_' + str(id)
             a['format_time_id'] = 'format_time_' + str(id)
             appt_list.append(a)
-    print(appt_list)
 
 def AdjustAppointment(appointment_id, status):
     if (status == 'Cancelled'):
@@ -40,14 +38,11 @@ def AdjustAppointment(appointment_id, status):
                 appt_list.remove(a)
                 break
 
-        print("cancelled my friend")
     else:
         for a in appt_list:
             if (a['patient'] == appointment_id):
                 a['status'] = status
                 break
-
-    print(appt_list)
 
 def GetTemplateIdTable():
     return appt_list

@@ -219,8 +219,6 @@
     var token = '{{csrf_token}}';
 
 	function status_update(id, element) {
-		//console.log("My My", id, element, element.value)
-		console.log("smokey, dokey")
 		$.ajax({
 			type: "POST",
 			headers: { "X-CSRFToken": token },
@@ -229,21 +227,8 @@
         	contentType: "application/json;",
         	data: JSON.stringify({'id': id, 'status': element.value}),
         	success: function(x) {
-				console.log('?', x)
-        		//$.ajax({
-				//	type: "POST",
-				//	headers: { "X-CSRFToken": token },
-        		//	url: "{% url 'dashboard' %}",
-				//	dataType: "json",
-				//	contentType: "application/json;",
-        		//	data: JSON.stringify({'id': id, 'status': status})
-    			//});
-				//get_appointments();
 				
-				console.log("okay, dokey")
 				if (element.value == "Cancelled") {
-					console.log("cancel this")
-					console.log($("#" + element.id))
 					$("#" + element.id).parent().parent().remove();
 				}
         	}
@@ -258,19 +243,6 @@
         });
 	}
 	
-	//function update_table() {
-	//	console.log('My Checkbox')
-		//for (a in appointment) {
-
-		//}
-	//	$("." + hide_show).hide();
-
-		//if (element.value == "Arrived") {
-		//	console.log($("#" + element.id))
-		//	$("#" + element.id).parent().parent().show();
-		//}
-	//}
-
 	function toggle_arrived(value, element) {
 		var elapsed_time = document.getElementsByClassName("ElapsedTime")
 		for (i=0; i<elapsed_time.length; i++) {

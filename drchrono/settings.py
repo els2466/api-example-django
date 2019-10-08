@@ -153,7 +153,3 @@ LOGGING = {
         },
     },
 }
-
-#https://els2466.drchrono.com/o/authorize/?state=eWlhy09pvvkocKLFCiooAs6Cg6AVsS9A&redirect_uri=http://127.0.0.1:8000/complete/drchrono/&response_type=code&client_id=None#/&response_type=code&client_id=None
-#https://els2466.drchrono.com/o/authorize/?state=t0KOnuymw7klClflWfHqkseAa6BMI80j&redirect_uri=http://localhost:8080/complete/drchrono/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB#/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB
-#https://els2466.drchrono.com/o/authorize/?state=eWlhy09pvvkocKLFCiooAs6Cg6AVsS9A&redirect_uri=http://127.0.0.1:8080/complete/drchrono/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB#/&response_type=code&client_id=dC9H1XKjBu0JNIjFD2LAHbuwU1TFGxp8pbsUp7yB

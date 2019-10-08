@@ -199,12 +199,8 @@ class PatientEndpoint(BaseEndpoint):
     def get_patients(self, doctor):
         patient_list = []
         patients = self.list(doctor=doctor)
-        #for yup in patients:
-        #for pb in patients:
-        #    print('Yup', pb)
-        #print("+++++++++ This is patients", patients)
+
         for p in patients:
-            #print("!!!!!!!!!!!!!!!!!!!")
             patient_fields = {
                 'doctor': doctor,
                 'id': p['id'],
@@ -221,14 +217,9 @@ class PatientEndpoint(BaseEndpoint):
                 'cell_phone': p['cell_phone'],
                 'patient_pic': p['patient_photo']
             }
-            #print('P **********', p)
             patient_list.append(patient_fields)
 
-        #print(patients)
-        #print(patient_list)
         return patient_list
-        #updated_patient, created = Patient.objects.update_or_create(defaults=patient_fields, pk=p['id'])
-
 
 class AppointmentEndpoint(BaseEndpoint):
     endpoint = "appointments"
@@ -274,10 +265,7 @@ class AppointmentEndpoint(BaseEndpoint):
             if not status:
                 status = ""
             checked_in = False #Appointment.patient_checked_in(status)
-            #try:
-            #    patient = Patient.objects.get(id=appt['patient'])
-            #except Patient.DoesNotExist:
-            #    patient = None
+
             appt_fields = {
                 #'patient': patient,
                 'doctor': doctor,
@@ -289,10 +277,7 @@ class AppointmentEndpoint(BaseEndpoint):
                 'checked_in': checked_in,
                 'reason': appt['reason']
             }
-            #print('P **********', p)
             appt_list.append(appt_fields)
-            #print(appt_fields['doctor'], appt_fields['appt_time'])
-            #updated_appt, created = Appointment.objects.update_or_create(defaults=appt_fields, pk=appt['id'])
 
         return appt_list
 
@@ -306,15 +291,6 @@ class DoctorEndpoint(BaseEndpoint):
         doctor['id'] = doctor_fields['id']
         doctor['first_name'] = doctor_fields['first_name']
         doctor['last_name'] = doctor_fields['last_name']
-        #update or create doctor model in db
-        #doctor['id'] = id
-        #doctor['first_name'] = first_name
-        #doctor['last_name'] = last_name
-        #doctor, created = Doctor.objects.update_or_create(pk=id,
-        #    defaults={
-        #        'first_name': first_name,
-        #        'last_name': last_name
-        #    })
         return doctor
 
     def update(self, id, data, partial=True, **kwargs):
